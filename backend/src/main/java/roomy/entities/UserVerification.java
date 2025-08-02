@@ -1,8 +1,10 @@
 package roomy.entities;
 
+
 import jakarta.persistence.*;
 import lombok.*;
-import roomy.constants.VerificationStatus;
+import roomy.entities.enums.VerificationStatus;
+
 
 import java.time.LocalDateTime;
 
