@@ -1,14 +1,18 @@
 package roomy.entities;
 
+
+import jakarta.persistence.Entity;
+import lombok.Setter;
+import lombok.ToString;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
-import roomy.constants.RoomType;
+import roomy.entities.enums.RoomType;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
 @Entity
 @Getter
 @Setter
