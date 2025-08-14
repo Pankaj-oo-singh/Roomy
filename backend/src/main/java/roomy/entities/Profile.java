@@ -8,31 +8,47 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 
 
-@Entity
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
-@Table(name = "profile")
+
+
+@Entity
+@Table(name = "profiles")
+@Data
 public class Profile {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
     private String fullName;
-    private Integer age;
-    private String gender;
-    private String occupation;
+    private String phoneNumber;
+    private String address;
     private String bio;
-    private String city;
-    private String profilePicUrl;
+    private String profileImageUrl;
 
-    private String lifestyle;
+    // New fields
+
+    private boolean verificationStatus = false;
+
+    // Store social links as JSON string or comma-separated string
+    @Column(length = 2000)
     private String socialLinks;
+
+    @Column(updatable = false)
+    private LocalDateTime createdAt;
+
+    // Automatically set createdAt on persist
+    @PrePersist
+    public void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
 }

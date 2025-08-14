@@ -14,6 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import roomy.filters.JwtAuthFilter;
 
+import static javax.swing.text.html.FormSubmitEvent.MethodType.POST;
 import static roomy.entities.enums.Role.ADMIN;
 import static roomy.entities.enums.Role.CREATOR;
 //
@@ -69,23 +70,31 @@ public class WebSecurityConfig {
             "/error", "/auth/**", "/home.html"
     };
 
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(publicRoutes).permitAll()
-                        .requestMatchers(HttpMethod.GET, "/posts/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/posts/**")
-                        .hasAnyRole(ADMIN.name(), CREATOR.name())
-                        .anyRequest().authenticated())
-                .csrf(csrfConfig -> csrfConfig.disable())
-                .sessionManagement(sessionConfig -> sessionConfig
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
-//                .formLogin(Customizer.withDefaults()); // Optional
 
-        return httpSecurity.build();
-    }
+
+@Bean
+public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+            .authorizeHttpRequests(auth -> auth
+                    .requestMatchers(publicRoutes).permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/room/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/api/room-reviews/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/api/room-reviews/**").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/documents/upload").authenticated()
+                    .requestMatchers(HttpMethod.GET, "/documents/my-documents").authenticated()
+                    .requestMatchers(HttpMethod.PUT, "/documents/**").hasRole("ADMIN")
+                    .requestMatchers(HttpMethod.POST, "/profile/upload-image").authenticated()
+                    .requestMatchers(HttpMethod.GET, "/profile/**").authenticated()
+                    // Anyone can view rooms
+                    .requestMatchers(HttpMethod.POST, "/api/room/**").authenticated() // Only logged-in users can create rooms
+                    .anyRequest().authenticated()
+            )
+            .csrf(csrf -> csrf.disable())
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+
+    return http.build();
+}
 
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
